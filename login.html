@@ -1,1 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Sign in to your account">
+  <title>Sign in · Northstar</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
 
+    * { box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 15% 15%, rgba(99, 102, 241, .18), transparent 30%),
+        radial-gradient(circle at 85% 80%, rgba(14, 165, 233, .16), transparent 28%),
+        #f8fafc;
+    }
+
+    .field:focus-within {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, .12);
+    }
+
+    .field input:focus {
+      outline: none;
+      border-color: transparent;
+    }
+
+    .password-toggle { transition: color .2s ease; }
+    .password-toggle:hover { color: #4f46e5; }
+
+    .shake {
+      animation: shake .32s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    .form-button:disabled {
+      opacity: .75;
+      cursor: wait;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-900 antialiased">
+  <main class="flex min-h-screen items-center justify-center px-4 py-10 sm:px-6 lg:px-8">
+    <section class="w-full max-w-md rounded-3xl bg-white/90 p-7 shadow-xl shadow-slate-900/10 ring-1 ring-slate-900/5 backdrop-blur-xl sm:p-9" aria-labelledby="login-title">
+      <div class="mb-9 flex items-center gap-3">
+        <a href="#" aria-label="Northstar home" class="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-600 text-white shadow-lg shadow-indigo-500/30">
+          <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 2.5 14.4 9.6 21.5 12l-7.1 2.4L12 21.5 9.6 14.4 2.5 12l7.1-2.4L12 2.5Z" fill="currentColor"/>
+          </svg>
+        </a>
+        <div>
+          <p class="text-sm font-semibold text-indigo-600">NORTHSTAR</p>
+          <p class="text-xs text-slate-500">Work smarter, together</p>
+        </div>
+      </div>
+
+      <div class="mb-8">
+        <h1 id="login-title" class="text-2xl font-bold tracking-tight sm:text-3xl">Welcome back</h1>
+        <p class="mt-2 text-sm text-slate-600">Sign in to continue to your workspace.</p>
+      </div>
+
+      <form id="loginForm" novalidate>
+        <div id="formMessage" class="mb-5 hidden rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700" role="alert">
+          <span id="formMessageText"></span>
+        </div>
+
+        <div class="space-y-5">
+          <div>
+            <label for="email" class="mb-2 block text-sm font-medium text-slate-700">Email address</label>
+            <div class="field relative rounded-xl border border-slate-300 bg-white transition">
+              <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                  <path d="M4 6.5h16v11H4v-11Z" stroke-linecap="round" stroke-linejoin="round"/><path d="m4 7 8 6 8-6" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <input id="email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com" class="h-12 w-full rounded-xl border-0 bg-transparent py-3 pl-11 pr-4 text-sm text-slate-900 placeholder:text-slate-400" required>
+            </div>
+            <p id="emailError" class="mt-1.5 hidden text-xs font-medium text-rose-600"></p>
+          </div>
+
+          <div>
+            <div class="mb-2 flex items-center justify-between">
+              <label for="password" class="text-sm font-medium text-slate-700">Password</label>
+              <a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">Forgot password?</a>
+            </div>
+            <div class="field relative rounded-xl border border-slate-300 bg-white transition">
+              <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" class="h-12 w-full rounded-xl border-0 bg-transparent py-3 pl-4 pr-12 text-sm text-slate-900 placeholder:text-slate-400" required>
+              <button id="togglePassword" type="button" class="password-toggle absolute inset-y-0 right-0 flex h-full w-12 items-center justify-center text-slate-400" aria-label="Show password" aria-pressed="false">
+                <svg id="eyeIcon" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                  <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="2.5"/>
+                </svg>
+              </button>
+            </div>
+            <p id="passwordError" class="mt-1.5 hidden text-xs font-medium text-rose-600"></p>
+          </div>
+
+          <div class="flex items-center justify-between text-sm">
+            <label for="remember" class="flex cursor-pointer items-center gap-2 text-slate-600">
+              <input id="remember" name="remember" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+              Remember me
+            </label>
+          </div>
+
+          <button id="submitButton" type="submit" class="form-button flex h-12 w-full items-center justify-center rounded-xl bg-indigo-600 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 transition hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-500/25 focus:outline-none focus:ring-4 focus:ring-indigo-500/20 active:translate-y-px disabled:bg-indigo-500">
+            <span id="buttonLabel">Sign in</span>
+            <svg id="loadingIcon" class="ml-0 hidden h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-opacity=".25" stroke-width="3"/><path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+      </form>
+
+      <div class="my-7 h-px bg-slate-200" aria-hidden="true"></div>
+
+      <div class="text-center text-sm text-slate-500">
+        New to Northstar?
+        <a href="#" class="ml-1 font-semibold text-indigo-600 hover:text-indigo-500">Create an account</a>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const form = document.getElementById('loginForm');
+    const email = document.getElementById('email');
+    const password = document.getElementById('password');
+    const emailError = document.getElementById('emailError');
+    const passwordError = document.getElementById('passwordError');
+    const formMessage = document.getElementById('formMessage');
+    const formMessageText = document.getElementById('formMessageText');
+    const submitButton = document.getElementById('submitButton');
+    const buttonLabel = document.getElementById('buttonLabel');
+    const loadingIcon = document.getElementById('loadingIcon');
+    const togglePassword = document.getElementById('togglePassword');
+    const eyeIcon = document.getElementById('eyeIcon');
+
+    const showEye = '<path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="2.5"/>';
+    const hideEye = '<path d="m4 4 16 16M9.9 5.9A9.8 9.8 0 0 1 12 5.5c6 0 9.5 6.5 9.5 6.5a17.2 17.2 0 0 1-2.2 3M6.3 6.9C3.7 8.5 2.5 12 2.5 12s3.5 6.5 9.5 6.5c1.2 0 2.3-.2 3.3-.6" stroke-linecap="round" stroke-linejoin="round"/>';
+
+    function setError(input, errorElement, message) {
+      if (message) {
+        errorElement.textContent = message;
+        errorElement.classList.remove('hidden');
+        input.setAttribute('aria-invalid', 'true');
+        input.closest('.field').classList.add('border-rose-300');
+      } else {
+        errorElement.textContent = '';
+        errorElement.classList.add('hidden');
+        input.removeAttribute('aria-invalid');
+        input.closest('.field').classList.remove('border-rose-300');
+      }
+    }
+
+    function hideMessage() {
+      formMessage.classList.add('hidden');
+      formMessage.classList.remove('border-amber-200', 'bg-amber-50', 'text-amber-700', 'border-rose-200', 'bg-rose-50', 'text-rose-700');
+    }
+
+    function showMessage(message, type = 'error') {
+      hideMessage();
+      formMessage.classList.remove('hidden');
+      if (type === 'error') {
+        formMessage.classList.add('border-rose-200', 'bg-rose-50', 'text-rose-700');
+      } else {
+        formMessage.classList.add('border-emerald-200', 'bg-emerald-50', 'text-emerald-700');
+      }
+      formMessageText.textContent = message;
+    }
+
+    email.addEventListener('input', () => setError(email, emailError, ''));
+    password.addEventListener('input', () => setError(password, passwordError, ''));
+    togglePassword.addEventListener('click', () => {
+      const showing = password.type === 'text';
+      password.type = showing ? 'password' : 'text';
+      eyeIcon.innerHTML = showing ? showEye : hideEye;
+      togglePassword.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+      togglePassword.setAttribute('aria-pressed', String(!showing));
+      password.focus();
+    });
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      hideMessage();
+
+      const emailValue = email.value.trim();
+      const passwordValue = password.value;
+      let valid = true;
+
+      if (!emailValue) {
+        setError(email, emailError, 'Enter your email address.');
+        valid = false;
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) {
+        setError(email, emailError, 'Enter a valid email address.');
+        valid = false;
+      }
+
+      if (!passwordValue) {
+        setError(password, passwordError, 'Enter your password.');
+        valid = false;
+      }
+
+      if (!valid) {
+        form.classList.remove('shake');
+        void form.offsetWidth;
+        form.classList.add('shake');
+        (email.getAttribute('aria-invalid') ? email : password).focus();
+        return;
+      }
+
+      submitButton.disabled = true;
+      buttonLabel.textContent = 'Signing in';
+      loadingIcon.classList.remove('hidden');
+
+      setTimeout(() => {
+        submitButton.disabled = false;
+        buttonLabel.textContent = 'Sign in';
+        loadingIcon.classList.add('hidden');
+        showMessage('Signed in successfully. This is a front-end demo.', 'success');
+        form.reset();
+        password.type = 'password';
+        eyeIcon.innerHTML = showEye;
+        togglePassword.setAttribute('aria-label', 'Show password');
+        togglePassword.setAttribute('aria-pressed', 'false');
+      }, 900);
+    });
+  </script>
+</body>
+</html>
